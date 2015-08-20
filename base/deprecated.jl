@@ -140,9 +140,6 @@ end
 @deprecate inf{T<:AbstractFloat}(::Type{T})  convert(T,Inf)
 @deprecate nan{T<:AbstractFloat}(::Type{T})  convert(T,NaN)
 
-export String
-const String = AbstractString
-
 export Uint, Uint8, Uint16, Uint32, Uint64, Uint128
 const Uint = UInt
 const Uint8 = UInt8
