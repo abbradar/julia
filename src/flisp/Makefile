@@ -24,9 +24,16 @@ DOBJS = $(SRCS:%.c=$(BUILDDIR)/%.dbg.obj)
 LLTDIR = ../support
 LLT_release = $(BUILDDIR)/$(LLTDIR)/libsupport.a
 LLT_debug = $(BUILDDIR)/$(LLTDIR)/libsupport-debug.a
-LIBFILES_release = $(LLT_release) $(LIBUV) $(LIBUTF8PROC)
-LIBFILES_debug = $(LLT_debug) $(LIBUV) $(LIBUTF8PROC)
-LIBS =
+LIBFILES_common =
+ifeq ($(USE_SYSTEM_UTF8PROC), 0)
+  LIBFILES_common += $(LIBUTF8PROC)
+endif
+ifeq ($(USE_SYSTEM_LIBUV), 0)
+  LIBFILES_common += $(LIBUV)
+endif
+LIBFILES_release = $(LLT_release) $(LIBFILES_common)
+LIBFILES_debug = $(LLT_debug) $(LIBFILES_common)
+LIBS = -l$(LIBUTF8PROC) -l$(LIBUV)
 ifneq ($(OS),WINNT)
 LIBS += -lpthread
 endif

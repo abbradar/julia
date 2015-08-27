@@ -663,7 +663,7 @@ else
 endif
 
 ifeq ($(USE_SYSTEM_UTF8PROC), 1)
-  LIBUTF8PROC = -lutf8proc
+  LIBUTF8PROC = utf8proc
   UTF8PROC_INC = /usr/include
 else
   LIBUTF8PROC = $(build_libdir)/libutf8proc.a
