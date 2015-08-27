@@ -274,7 +274,7 @@ function done(itr::EachLine, nada)
     true
 end
 next(itr::EachLine, nada) = (readline(itr.stream), nothing)
-eltype(::Type{EachLine}) = ByteString
+eltype(::Type{EachLine}) = UTF8String
 
 readlines(s=STDIN) = collect(eachline(s))
 

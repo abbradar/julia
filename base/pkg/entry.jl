@@ -347,7 +347,7 @@ function publish(branch::AbstractString)
     ahead_remote > 0 && error("METADATA is behind origin/$branch – run `Pkg.update()` before publishing")
     ahead_local == 0 && error("There are no METADATA changes to publish")
 
-    tags = Dict{ByteString,Vector{ASCIIString}}()
+    tags = Dict{UTF8String,Vector{ASCIIString}}()
     Git.run(`update-index -q --really-refresh`, dir="METADATA")
     cmd = `diff --name-only --diff-filter=AMR origin/$branch HEAD --`
     for line in eachline(Git.cmd(cmd, dir="METADATA"))
@@ -618,7 +618,7 @@ function tag(pkg::AbstractString, ver::Union{Symbol,VersionNumber}, force::Bool=
     end
 end
 
-function check_metadata(pkgs::Set{ByteString} = Set{ByteString}())
+function check_metadata{T<:ByteString}(pkgs::Set{T} = Set{UTF8String}())
     avail = Read.available()
     deps, conflicts = Query.dependencies(avail)
 

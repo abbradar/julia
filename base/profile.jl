@@ -96,8 +96,8 @@ clear_malloc_data() = ccall(:jl_clear_malloc_data, Void, ())
 #### Internal interface
 ####
 immutable LineInfo
-    func::ByteString
-    file::ByteString
+    func::UTF8String
+    file::UTF8String
     line::Int
     fromC::Bool
     ip::Int64 # large enough that this struct can be losslessly read on any machine (32 or 64 bit)
@@ -294,7 +294,7 @@ function tree_format(lilist::Vector{LineInfo}, counts::Vector{Int}, level::Int, 
     ntext = cols-nindent-ndigcounts-ndigline-5
     widthfile = floor(Integer,0.4ntext)
     widthfunc = floor(Integer,0.6ntext)
-    strs = Array(ByteString, length(lilist))
+    strs = Array(UTF8String, length(lilist))
     showextra = false
     if level > nindent
         nextra = level-nindent
@@ -464,7 +464,7 @@ end
 
 # Order alphabetically (file, function) and then by line number
 function liperm(lilist::Vector{LineInfo})
-    comb = Array(ByteString, length(lilist))
+    comb = Array(UTF8String, length(lilist))
     for i = 1:length(lilist)
         li = lilist[i]
         if li != UNKNOWN

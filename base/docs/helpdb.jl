@@ -4770,7 +4770,7 @@ Rotate matrix `A` right 90 degrees an integer `k` number of times. If `k` is zer
 rotr90
 
 doc"""
-    readdir([dir]) -> Vector{ByteString}
+    readdir([dir]) -> Vector{UTF8String}
 
 Returns the files and directories in the directory `dir` (or the current working directory if not given).
 """
