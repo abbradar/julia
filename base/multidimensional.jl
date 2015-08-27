@@ -46,6 +46,11 @@ for op in (:+, :-, :min, :max)
     end
 end
 
+# iteration over CartesianIndex
+start(index::CartesianIndex) = 1
+next(index::CartesianIndex, i) = (index[i], i+1)
+done(index::CartesianIndex, i) = i > length(index)
+
 @generated function *{N}(a::Integer, index::CartesianIndex{N})
     I = index
     args = [:(a*index[$d]) for d = 1:N]

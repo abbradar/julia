@@ -460,7 +460,51 @@ end
 
 ## sorting multi-dimensional arrays ##
 
-sort(A::AbstractArray, dim::Integer; kws...) = mapslices(a->sort(a; kws...), A, [dim])
+sort(A::AbstractArray, dim::Integer; kws...) = sortdim!(copy(A), dim; kws...)
+sort!(A::AbstractArray, dim::Integer; kws...) = sortdim!(A, dim; kws...)
+
+function sortdim!(A::Vector, dim::Integer; kws...)
+    dim != 1 && throw(ArgumentError("Bad dimension to sort."))
+    sort!(A; kws...)
+end
+
+function sortdim!(A::AbstractMatrix, dim::Integer; kws...)
+    if dim < 1 || dim > 2
+       throw(ArgumentError("Bad dimension to sort."))
+    end
+
+    if dim == 1
+        for idx = 1:size(A,2)
+            @inbounds sort!(slice(A, :, idx); kws...)
+        end
+    else
+        for idx = 1:size(A,1)
+            @inbounds sort!(slice(A, idx, :); kws...)
+        end
+    end
+
+    return A
+end
+
+function sortdim!(A::AbstractArray, dim::Integer; kws...)
+    ndimsA = ndims(A)
+    dimsA = size(A)
+
+    if dim < 1 || dim > ndimsA
+        throw(ArgumentError("Bad dimension to sort."))
+    end
+
+    pre_dims = dimsA[1:dim-1]
+    post_dims = dimsA[dim+1:end]
+
+    @inbounds for post_idx in CartesianRange(post_dims)
+        for pre_idx in CartesianRange(pre_dims)
+            sort!(slice(A, pre_idx..., :, post_idx...); kws...)
+        end
+    end
+
+    return A
+end
 
 function sortrows(A::AbstractMatrix; kws...)
     c = 1:size(A,2)
