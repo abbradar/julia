@@ -29,7 +29,7 @@ end
 
 function dependencies(avail::Dict, fix::Dict = Dict{UTF8String,Fixed}("julia"=>Fixed(VERSION)))
     avail = deepcopy(avail)
-    conflicts = Dict{UTF8String,Set{ByteString}}()
+    conflicts = Dict{UTF8String,Set{UTF8String}}()
     for (fp,fx) in fix
         delete!(avail, fp)
         for (ap,av) in avail, (v,a) in copy(av)
@@ -326,12 +326,12 @@ end
 
 # Build a subgraph incuding only the (direct and indirect) dependencies
 # of a given package set
-function dependencies_subset(deps::Dict{ByteString,Dict{VersionNumber,Available}}, pkgs::Set{ByteString})
+function dependencies_subset{T<:ByteString}(deps::Dict{T,Dict{VersionNumber,Available}}, pkgs::Set{T})
 
     staged = pkgs
     allpkgs = copy(pkgs)
     while !isempty(staged)
-        staged_next = Set{ByteString}()
+        staged_next = Set{UTF8String}()
         for p in staged, a in values(deps[p]), rp in keys(a.requires)
             if !(rp in allpkgs)
                 push!(staged_next, rp)
@@ -346,15 +346,15 @@ end
 
 # Build a subgraph incuding only the (direct and indirect) dependencies and dependants
 # of a given package set
-function undirected_dependencies_subset(deps::Dict{ByteString,Dict{VersionNumber,Available}}, pkgs::Set{ByteString})
+function undirected_dependencies_subset{T<:ByteString}(deps::Dict{T,Dict{VersionNumber,Available}}, pkgs::Set{T})
 
-    graph = Dict{ByteString, Set{ByteString}}()
+    graph = Dict{UTF8String, Set{UTF8String}}()
 
     for (p,d) in deps
-        haskey(graph, p) || (graph[p] = Set{ByteString}())
+        haskey(graph, p) || (graph[p] = Set{UTF8String}())
         for a in values(d), rp in keys(a.requires)
             push!(graph[p], rp)
-            haskey(graph, rp) || (graph[rp] = Set{ByteString}())
+            haskey(graph, rp) || (graph[rp] = Set{UTF8String}())
             push!(graph[rp], p)
         end
     end
@@ -362,7 +362,7 @@ function undirected_dependencies_subset(deps::Dict{ByteString,Dict{VersionNumber
     staged = pkgs
     allpkgs = copy(pkgs)
     while !isempty(staged)
-        staged_next = Set{ByteString}()
+        staged_next = Set{UTF8String}()
         for p in staged, rp in graph[p]
             if !(rp in allpkgs)
                 push!(staged_next, rp)
@@ -375,15 +375,15 @@ function undirected_dependencies_subset(deps::Dict{ByteString,Dict{VersionNumber
     return subdeps(deps, allpkgs)
 end
 
-function filter_dependencies(reqs::Requires, deps::Dict{ByteString,Dict{VersionNumber,Available}})
-    deps = dependencies_subset(deps, Set{ByteString}(keys(reqs)))
+function filter_dependencies{T<:ByteString}(reqs::Requires, deps::Dict{T,Dict{VersionNumber,Available}})
+    deps = dependencies_subset(deps, Set{UTF8String}(keys(reqs)))
     deps, _, _ = filter_versions(reqs, deps)
 
     return deps
 end
 
-function prune_dependencies(reqs::Requires, deps::Dict{ByteString,Dict{VersionNumber,Available}})
-    deps = dependencies_subset(deps, Set{ByteString}(keys(reqs)))
+function prune_dependencies{T<:ByteString}(reqs::Requires, deps::Dict{T,Dict{VersionNumber,Available}})
+    deps = dependencies_subset(deps, Set{UTF8String}(keys(reqs)))
     deps, _ = prune_versions(reqs, deps)
 
     return deps
