@@ -345,7 +345,7 @@ function show_trace_entry(io, fname, file, line, inlinedfile, inlinedline, n)
 
     if (inlinedfile != symbol(""))
         print(io, " at ", inlinedfile, ":", inlinedline)
-        print(io, " \n    [ thrown by inlined function defined at ]\n    ")
+        print(io, " \n    by code inlined from:\n   ")
     else
         print(io, " at ")
     end
